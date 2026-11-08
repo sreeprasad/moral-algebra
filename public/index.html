@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decide Scientifically</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#e7e1cf; --paper:#f8f3e5; --ink:#1d2a44; --faint:#7a8296; --rule:#cfdaea;
+  --margin:#d98073; --mark:#2f5d9e; --con:#9a3b2f;
+  --serif:"Newsreader", Georgia, serif; --hand:"Dancing Script", "Snell Roundhand", cursive; --pen:#1f2f5c; --mono:"IBM Plex Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--desk);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:32px}
+button{font:inherit;color:inherit}
+input{font:inherit;color:inherit;background:transparent;border:0;outline:0;width:100%;height:32px;line-height:22px;padding:9px 0 0;display:block}
+input::placeholder{color:var(--faint);opacity:.7;font-family:var(--serif);font-style:italic;font-weight:400;font-size:18px}
+input:focus{background:rgba(47,93,158,.07)}
+
+.pad{max-width:980px;margin:32px auto;background:var(--paper);position:relative;
+  background-image:linear-gradient(transparent 31px,var(--rule) 31px);background-size:100% 32px;
+  padding:32px 32px 64px 76px;min-height:85vh;
+  box-shadow:0 1px 0 #d6cdb6,0 14px 32px -20px rgba(40,30,10,.4)}
+.pad::before{content:"";position:absolute;top:0;bottom:0;left:56px;width:1px;background:var(--margin)}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;height:32px;padding-bottom:6px;
+  font-family:var(--mono);font-size:13px;line-height:1}
+.brand{letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.tools{display:flex;gap:18px;align-items:flex-end;position:relative}
+.link{background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:var(--mono);font-size:13px}
+.link:hover{color:var(--mark)}
+
+#q{font-family:var(--hand);color:var(--pen);font-size:38px;font-weight:500;height:44px;margin:24px 0 28px;line-height:38px;padding-top:5px}
+#q::placeholder{font-size:26px}
+
+.chart{display:grid;grid-template-columns:1fr}
+.chart.two{grid-template-columns:1fr 1fr}
+.chart:not(.two) .col{padding-right:0}
+.acts{display:flex;gap:28px;align-items:flex-end}
+#addb{line-height:1;padding-bottom:7px}
+#addb[hidden]{display:none}
+.col{padding:0 20px;min-width:0;background:linear-gradient(var(--ink),var(--ink)) 0 30px/100% 2px no-repeat}
+.col:first-child{padding-left:0}
+.col[data-side="b"]{border-left:2px solid var(--ink)}
+.name{font-family:var(--hand);color:var(--pen);font-size:36px;font-weight:700;height:44px;margin:-8px 0 -4px;line-height:36px;padding-top:7px}
+.name::placeholder{font-weight:600;font-style:normal;font-size:22px}
+
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:32px;
+  height:32px;line-height:1;display:flex;align-items:flex-end;padding-bottom:6px}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:flex-end;gap:10px;height:32px}
+li::before{font-family:var(--mono);width:12px;flex:none;color:var(--mark);line-height:22px;padding-bottom:1px}
+ul[data-kind="pros"] li::before{content:"+"}
+ul[data-kind="cons"] li::before{content:"−";color:var(--con)}
+.w{display:flex;gap:4px;flex:none;margin-bottom:8px}
+.w button{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--ink);background:none;padding:0;cursor:pointer;opacity:.45}
+.w button.on{background:var(--ink);opacity:1}
+ul[data-kind="cons"] .w button{border-color:var(--con)}
+ul[data-kind="cons"] .w button.on{background:var(--con)}
+.x{background:none;border:0;cursor:pointer;color:var(--faint);padding:0 2px;font-size:18px;line-height:22px;flex:none}
+.x:hover{color:var(--con)}
+.add{padding-left:22px}
+.t,.add{font-family:var(--hand);color:var(--pen);font-size:28px;font-weight:500;line-height:28px;padding-top:4px;height:40px;margin-bottom:-8px}
+.col{position:relative}
+.col[hidden]{display:none}
+.drop{position:absolute;right:20px;top:0;height:32px;display:flex;align-items:flex-end;padding-bottom:7px;line-height:1}
+.compare{border-left:2px dashed var(--rule);padding:0 20px}
+.compare[hidden]{display:none}
+.compare button{display:flex;align-items:flex-end;height:32px;padding:0 0 7px;line-height:1;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--faint);text-decoration:underline;text-underline-offset:4px}
+.compare button:hover{color:var(--mark)}
+.compare p{margin:0;font-family:var(--mono);font-size:12px;color:var(--faint);line-height:32px}
+.tally{margin-top:32px;font-family:var(--mono);font-size:14px;border-top:1px solid var(--ink)}
+.tally div{height:32px;line-height:1;display:flex;align-items:flex-end;padding-bottom:6px;gap:12px}
+.tally span{width:72px;color:var(--faint);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.tally .net-row{font-weight:500}
+.tally .net-row span{color:var(--ink)}
+.tally b{font-weight:inherit}
+
+.bar{display:flex;justify-content:space-between;align-items:flex-end;margin-top:64px;gap:16px;flex-wrap:wrap}
+.hint{font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1;padding-bottom:6px}
+#decide{border:1.5px solid var(--ink);background:none;height:32px;line-height:1;padding:0 16px;cursor:pointer;
+  font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+#decide:hover{background:var(--ink);color:var(--paper)}
+#decide:disabled{opacity:.5;cursor:wait}
+
+#verdict{margin-top:32px}
+.stamp{display:inline-block;border:2px solid var(--mark);color:var(--mark);padding:0 14px;transform:rotate(-1.5deg);
+  font-family:var(--mono);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.stamp strong{font-family:var(--hand);font-size:26px;font-weight:700;text-transform:none;letter-spacing:0}
+#verdict ol li{font-family:var(--hand);font-size:22px;color:var(--pen)}
+.why{margin:32px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+#verdict ol{margin:0;padding-left:22px}
+#verdict ol li{display:list-item;height:32px;line-height:32px}
+#verdict ol li::before{content:none}
+.tag{font-family:var(--mono);font-size:12px;color:var(--faint);margin-right:6px}
+.tag.cons{color:var(--con)}
+.score{font-family:var(--mono);font-size:12px;color:var(--faint);margin-left:6px}
+.tie{margin:32px 0 0;font-family:var(--mono);font-size:12px;color:var(--faint);line-height:32px}
+.tie .link{font-size:12px}
+.count{margin-top:32px;height:64px;display:flex;align-items:flex-end;gap:14px;padding-bottom:6px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.count .n{font-family:var(--hand);font-size:56px;line-height:.8;color:var(--pen);text-transform:none;letter-spacing:0}
+.coin-wrap{perspective:700px;height:128px;margin-top:32px;display:flex;align-items:center}
+.coin{width:104px;height:104px;position:relative;transform-style:preserve-3d}
+.coin .face{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:14px;text-align:center;overflow:hidden;
+  background:radial-gradient(circle at 35% 30%,#fdf8ea,#e4d8bb);border:2px solid var(--mark);
+  box-shadow:inset 0 0 0 6px var(--paper),inset 0 0 0 7.5px var(--mark),0 6px 14px -8px rgba(30,30,60,.45);
+  font-family:var(--hand);font-weight:700;font-size:22px;line-height:1.05;color:var(--pen)}
+.coin .back{transform:rotateY(180deg)}
+.coin.landed-b{transform:rotateY(180deg)}
+.coin.flip-a{animation:flipA 1.9s cubic-bezier(.25,.6,.3,1) forwards}
+.coin.flip-b{animation:flipB 1.9s cubic-bezier(.25,.6,.3,1) forwards}
+@keyframes flipA{0%{transform:translateY(0) rotateY(0)}45%{transform:translateY(-56px) rotateY(1080deg)}100%{transform:translateY(0) rotateY(1800deg)}}
+@keyframes flipB{0%{transform:translateY(0) rotateY(0)}45%{transform:translateY(-56px) rotateY(1170deg)}100%{transform:translateY(0) rotateY(1980deg)}}
+@media (prefers-reduced-motion:reduce){.coin.flip-a,.coin.flip-b{animation:none}.coin.flip-b{transform:rotateY(180deg)}}
+.fine,.err{font-family:var(--mono);font-size:12px;color:var(--faint)}
+.err{color:var(--con)}
+
+details.hist summary{list-style:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+details.hist summary::-webkit-details-marker{display:none}
+.hist .panel{position:absolute;right:0;top:36px;z-index:5;width:300px;max-height:320px;overflow:auto;
+  background:var(--paper);border:1px solid var(--ink);padding:8px 12px;box-shadow:0 10px 24px -14px rgba(0,0,0,.4)}
+.hist .panel button{display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:4px 0;
+  font-family:var(--serif);font-size:16px;line-height:22px}
+.hist .panel button:hover{color:var(--mark)}
+.hist .panel small{display:block;font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+@media (max-width:680px){
+  .pad{margin:0;padding:16px 16px 48px 40px;min-height:100vh}
+  .pad::before{left:28px}
+  .chart,.chart.two{grid-template-columns:1fr}
+  .acts{gap:16px;flex-wrap:wrap}
+  .col,.col:first-child{padding:0}
+  .col[data-side="b"],.compare{border-left:0;margin-top:32px;padding:0}
+  #q{font-size:22px;line-height:22px;padding-top:8px}
+  .hist .panel{width:260px}
+}
+.col{display:flex;flex-direction:column}
+.tally{margin-top:auto}
+.add[data-kind="cons"]{margin-bottom:24px}
+</style>
+</head>
+<body>
+<main class="pad">
+  <div class="top">
+    <span class="brand">Decide Scientifically</span>
+    <div class="tools">
+      <button class="link" id="new" type="button">New</button>
+      <details class="hist"><summary>History</summary><div class="panel" id="histlist"></div></details>
+      <button class="link" id="share" type="button">Copy link</button>
+    </div>
+  </div>
+
+  <input id="q" placeholder="What are you deciding?" aria-label="What are you deciding?">
+
+  <div class="chart" id="chart">
+    <section class="col" data-side="a">
+      <input class="name" placeholder="Option A" aria-label="Option A name">
+      <div class="label">Pros</div>
+      <ul data-kind="pros"></ul>
+      <input class="add" data-kind="pros" placeholder="add a reason, press enter">
+      <div class="label">Cons</div>
+      <ul data-kind="cons"></ul>
+      <input class="add" data-kind="cons" placeholder="add a reason, press enter">
+      <div class="tally">
+        <div><span>Pros</span><b class="tp"></b></div>
+        <div><span>Cons</span><b class="tc"></b></div>
+        <div class="net-row"><span>Net</span><b class="tn"></b></div>
+      </div>
+    </section>
+    <section class="col" data-side="b" hidden>
+      <input class="name" placeholder="Option B" aria-label="Option B name">
+      <button class="link drop" id="dropb" type="button">remove</button>
+      <div class="label">Pros</div>
+      <ul data-kind="pros"></ul>
+      <input class="add" data-kind="pros" placeholder="add a reason, press enter">
+      <div class="label">Cons</div>
+      <ul data-kind="cons"></ul>
+      <input class="add" data-kind="cons" placeholder="add a reason, press enter">
+      <div class="tally">
+        <div><span>Pros</span><b class="tp"></b></div>
+        <div><span>Cons</span><b class="tc"></b></div>
+        <div class="net-row"><span>Net</span><b class="tn"></b></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="bar">
+    <span class="hint">Weight each reason 1–5. Net = pros − cons.</span>
+    <div class="acts">
+      <button class="link" id="addb" type="button">+ Compare with another option</button>
+      <button id="decide" type="button">Decide for me</button>
+    </div>
+  </div>
+  <div id="verdict" aria-live="polite"></div>
+</main>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const SIDES = ['a', 'b'], KINDS = ['pros', 'cons'], HKEY = 'ma-history';
+
+const blank = () => ({
+  id: Math.random().toString(36).slice(2, 10), q: '', at: Date.now(), v: null, two: false,
+  a: { name: '', pros: [], cons: [] }, b: { name: '', pros: [], cons: [] }
+});
+let state = blank();
+
+// ---- share links: state lives in the URL fragment, compressed ----
+async function encode(obj) {
+  const stream = new Blob([JSON.stringify(obj)]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+  const buf = new Uint8Array(await new Response(stream).arrayBuffer());
+  let bin = ''; for (const b of buf) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+async function decode(str) {
+  const bin = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return JSON.parse(await new Response(stream).text());
+}
+function normalize(s) {
+  const b = blank();
+  if (!s || typeof s !== 'object') return b;
+  const side = x => ({ name: String(x?.name ?? ''), pros: (x?.pros ?? []).map(item), cons: (x?.cons ?? []).map(item) });
+  const item = i => ({ t: String(i?.t ?? ''), w: Math.min(5, Math.max(1, Number(i?.w) || 3)) });
+  const B = side(s.b);
+  const two = !!s.two || !!(B.name || B.pros.length || B.cons.length);
+  return { id: String(s.id || b.id), q: String(s.q ?? ''), at: Number(s.at) || Date.now(), v: s.v ?? null, two, a: side(s.a), b: B };
+}
+
+// ---- local history ----
+const readHist = () => { try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch { return []; } };
+const isEmpty = s => !s.q && SIDES.every(k => !s[k].name && !s[k].pros.length && !s[k].cons.length);
+let saveTimer;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
+async function save() {
+  if (isEmpty(state)) { history.replaceState(null, '', location.pathname); return; }
+  state.at = Date.now();
+  try {
+    const list = readHist().filter(s => s.id !== state.id);
+    list.unshift(state);
+    localStorage.setItem(HKEY, JSON.stringify(list.slice(0, 30)));
+  } catch {}
+  history.replaceState(null, '', '#' + await encode(state));
+}
+
+// ---- rendering ----
+const net = side => side.pros.reduce((n, i) => n + i.w, 0) - side.cons.reduce((n, i) => n + i.w, 0);
+const fmt = n => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n);
+
+function render() {
+  $('#q').value = state.q;
+  $('.col[data-side="b"]').hidden = !state.two;
+  $('#chart').classList.toggle('two', state.two);
+  $('#addb').hidden = state.two;
+  for (const s of SIDES) {
+    const col = $(`.col[data-side="${s}"]`);
+    $('.name', col).value = state[s].name;
+    for (const k of KINDS) {
+      const ul = $(`ul[data-kind="${k}"]`, col);
+      ul.innerHTML = state[s][k].map((it, i) => `
+        <li data-i="${i}">
+          <input class="t" value="${esc(it.t)}" aria-label="reason">
+          <span class="w" role="group" aria-label="weight">${[1, 2, 3, 4, 5].map(n =>
+            `<button type="button" data-w="${n}" class="${n <= it.w ? 'on' : ''}" aria-label="weight ${n}"></button>`).join('')}</span>
+          <button type="button" class="x" aria-label="remove">×</button>
+        </li>`).join('');
+    }
+  }
+  renderNets();
+  renderVerdict();
+}
+function renderNets() {
+  for (const s of SIDES) {
+    const col = $(`.col[data-side="${s}"]`), side = state[s];
+    const pros = side.pros.reduce((n, i) => n + i.w, 0), cons = side.cons.reduce((n, i) => n + i.w, 0);
+    $('.tp', col).textContent = String(pros);
+    $('.tc', col).textContent = String(cons);
+    $('.tn', col).textContent = fmt(pros - cons);
+  }
+}
+function renderVerdict() {
+  const el = $('#verdict'), v = state.v;
+  if (!v) { el.innerHTML = ''; return; }
+  if (v.tie) {
+    const faces = coinFaces();
+    const said = !v.coin ? ''
+      : state.two ? `Coin says <strong>${esc(state[v.coin].name)}</strong>`
+      : `Coin says ${v.coin === 'a' ? 'go with' : 'pass on'} <strong>${esc(state.a.name)}</strong>`;
+    el.innerHTML = `
+      <p class="tie">${tieReason()}</p>
+      ${v.coin ? `<div class="coin-wrap"><div class="coin landed-${v.coin}">
+        <div class="face front">${esc(faces[0])}</div><div class="face back">${esc(faces[1])}</div></div></div>
+      <div class="stamp">${said}</div>` : ''}
+      <p class="tie">Not convinced? <button class="link" id="tiebreak" type="button">Use AI to decide</button></p>`;
+    $('#tiebreak').addEventListener('click', () => decide(true));
+    return;
+  }
+  const top = [...(v.factors || [])].sort((x, y) => y.score - x.score).slice(0, 4);
+  let head;
+  if (v.single) {
+    const yes = v.p >= 0.5;
+    head = `${yes ? 'Go with' : 'Pass on'} <strong>${esc(state.a.name)}</strong> · ${Math.round((yes ? v.p : 1 - v.p) * 100)}%`;
+  } else {
+    head = `Go with <strong>${esc(state[v.pick]?.name || v.pick)}</strong> · ${Math.round(v.p * 100)}%`;
+  }
+  const tag = f => (f.kind === 'pros' ? 'pro' : 'con') + (v.single ? '' : ' ' + esc(state[f.side]?.name || f.side));
+  el.innerHTML = `
+    <div class="stamp">${head}</div>
+    ${top.length ? `<p class="why">Weighed most</p><ol>${top.map(f => `
+      <li><span class="tag ${f.kind}">${tag(f)}</span>${esc(f.t)}<span class="score">${Math.round(f.score * 100)}</span></li>`).join('')}</ol>` : ''}`;
+}
+
+// ---- edits ----
+function changed(rerender) {
+  if (state.v) { state.v = null; renderVerdict(); }
+  rerender ? renderKeepFocus() : renderNets();
+  scheduleSave();
+}
+// Re-render without losing the field the cursor is in
+function renderKeepFocus() {
+  const el = document.activeElement, chart = $('#chart');
+  let d = null;
+  if (el && chart.contains(el) && el.tagName === 'INPUT') {
+    const { s, k, i } = locate(el);
+    d = { s, k, i, cls: ['t', 'add', 'name'].find(c => el.classList.contains(c)), pos: el.selectionStart };
+  }
+  render();
+  if (!d || !d.cls) return;
+  const col = $(`.col[data-side="${d.s}"]`);
+  const target = d.cls === 't' ? $(`ul[data-kind="${d.k}"] li[data-i="${d.i}"] .t`, col)
+    : d.cls === 'add' ? $(`.add[data-kind="${d.k}"]`, col) : $('.name', col);
+  if (!target) return;
+  target.focus();
+  if (d.pos != null) target.setSelectionRange(d.pos, d.pos);
+}
+const locate = el => {
+  const col = el.closest('.col'), ul = el.closest('ul'), li = el.closest('li');
+  return { s: col?.dataset.side, k: ul?.dataset.kind ?? el.dataset.kind, i: li ? Number(li.dataset.i) : -1 };
+};
+
+$('#q').addEventListener('input', e => { state.q = e.target.value; scheduleSave(); });
+
+$('#chart').addEventListener('input', e => {
+  const t = e.target, { s, k, i } = locate(t);
+  if (t.classList.contains('name')) { state[s].name = t.value; changed(false); }
+  else if (t.classList.contains('t')) { state[s][k][i].t = t.value; changed(false); }
+});
+$('#chart').addEventListener('click', e => {
+  const t = e.target, { s, k, i } = locate(t);
+  if (t.dataset.w) { state[s][k][i].w = Number(t.dataset.w); changed(true); }
+  else if (t.classList.contains('x')) { state[s][k].splice(i, 1); changed(true); }
+});
+// Arrow up/down moves between the question, an option's name and its reasons
+document.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  const t = e.target;
+  if (t.tagName !== 'INPUT') return;
+  const col = t.closest('.col') || $('.col[data-side="a"]');
+  const fields = [$('#q'), ...$$('.name, .t, .add', col)];
+  const next = fields[fields.indexOf(t) + (e.key === 'ArrowUp' ? -1 : 1)];
+  if (!next) return;
+  e.preventDefault();
+  const pos = Math.min(t.selectionStart ?? 0, next.value.length);
+  next.focus();
+  next.setSelectionRange(pos, pos);
+});
+$('#chart').addEventListener('keydown', e => {
+  const t = e.target;
+  if (e.key !== 'Enter' || !t.classList.contains('add')) return;
+  if (commitAdd(t)) changed(true);
+});
+
+// Text typed into an "add a reason" line counts even without pressing Enter
+function commitAdd(input) {
+  const text = input.value.trim();
+  if (!text) return false;
+  const { s, k } = locate(input);
+  state[s][k].push({ t: text, w: 3 });
+  input.value = '';
+  return true;
+}
+function commitAll(exceptFocused = false) {
+  let any = false;
+  for (const input of $$('#chart .add')) {
+    if (exceptFocused && input === document.activeElement) continue;
+    any = commitAdd(input) || any;
+  }
+  if (any) changed(true);
+}
+// When the cursor leaves an add line, save what was typed there. Wait until any
+// click has finished first, so the page doesn't shift under the mouse mid-click.
+let pointerDown = false, pending = false;
+document.addEventListener('pointerdown', () => { pointerDown = true; }, true);
+document.addEventListener('pointerup', () => {
+  pointerDown = false;
+  if (pending) setTimeout(flushPending, 0);
+}, true);
+function flushPending() { pending = false; commitAll(true); }
+$('#chart').addEventListener('focusout', e => {
+  if (!e.target.classList.contains('add') || !e.target.value.trim()) return;
+  pending = true;
+  if (!pointerDown) setTimeout(flushPending, 0);
+});
+
+$('#addb').addEventListener('click', () => {
+  state.two = true; changed(true);
+  $('.col[data-side="b"] .name').focus();
+});
+$('#dropb').addEventListener('click', () => {
+  const b = state.b;
+  if ((b.pros.length || b.cons.length) && !confirm(`Remove ${b.name || 'Option B'} and its reasons?`)) return;
+  state.two = false; state.b = { name: '', pros: [], cons: [] };
+  changed(true);
+});
+
+// ---- toolbar ----
+$('#new').addEventListener('click', () => {
+  state = blank();
+  history.replaceState(null, '', location.pathname);
+  render(); $('#q').focus();
+});
+$('#share').addEventListener('click', async e => {
+  commitAll();
+  clearTimeout(saveTimer); await save();
+  const btn = e.target;
+  try { await navigator.clipboard.writeText(location.href); btn.textContent = 'Copied'; }
+  catch { prompt('Copy this link', location.href); }
+  setTimeout(() => (btn.textContent = 'Copy link'), 1500);
+});
+$('.hist').addEventListener('toggle', e => {
+  if (!e.target.open) return;
+  const list = readHist();
+  $('#histlist').innerHTML = list.length ? list.map((s, i) => `
+    <button type="button" data-h="${i}">${esc(s.q || `${s.a.name || 'A'} vs ${s.b.name || 'B'}`)}
+      <small>${new Date(s.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</small></button>`).join('')
+    : '<span class="fine">Nothing saved yet.</span>';
+});
+$('#histlist').addEventListener('click', e => {
+  const b = e.target.closest('button[data-h]');
+  if (!b) return;
+  state = normalize(readHist()[Number(b.dataset.h)]);
+  $('.hist').open = false;
+  render(); scheduleSave();
+});
+
+// ---- decide ----
+$('#decide').addEventListener('click', () => decide(false));
+
+// ---- coin flip for even weights ----
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const coinFaces = () => state.two ? [state.a.name || 'A', state.b.name || 'B'] : ['Go', 'Pass'];
+function tieReason() {
+  const total = (side, k) => state[side][k].reduce((n, i) => n + i.w, 0);
+  return state.two
+    ? `Both options are even: ${esc(state.a.name)} nets ${fmt(net(state.a))}, ${esc(state.b.name)} nets ${fmt(net(state.b))}.`
+    : `Your pros and cons are the same: pros ${total('a', 'pros')}, cons ${total('a', 'cons')}.`;
+}
+let flipping = false;
+async function coinFlip() {
+  if (flipping) return;
+  flipping = true;
+  const el = $('#verdict'), btn = $('#decide');
+  const v = { tie: true, coin: Math.random() < 0.5 ? 'a' : 'b' };
+  state.v = v;
+  btn.disabled = true;
+  try {
+    const stillMine = () => state.v === v;   // stop if they edit the chart mid-flip
+    for (const n of [3, 2, 1]) {
+      el.innerHTML = `<p class="tie">${tieReason()}</p>
+        <div class="count" aria-live="polite"><span class="n">${n}</span>flipping a coin</div>`;
+      await sleep(1000);
+      if (!stillMine()) return;
+    }
+    const faces = coinFaces();
+    el.innerHTML = `<p class="tie">${tieReason()}</p>
+      <div class="coin-wrap"><div class="coin flip-${v.coin}">
+        <div class="face front">${esc(faces[0])}</div><div class="face back">${esc(faces[1])}</div></div></div>`;
+    await sleep(reducedMotion() ? 300 : 2000);
+    if (!stillMine()) return;
+    renderVerdict(); scheduleSave();
+  } finally {
+    flipping = false; btn.disabled = false;
+  }
+}
+
+// Even weights get a coin flip; "Use AI to decide" asks Jev instead
+async function decide(breakTie) {
+  commitAll();
+  const btn = $('#decide'), el = $('#verdict');
+  const sides = state.two ? SIDES : ['a'];
+  const count = sides.reduce((n, s) => n + state[s].pros.length + state[s].cons.length, 0);
+  if (sides.some(s => !state[s].name) || count < 2) {
+    el.innerHTML = `<p class="err">Name ${state.two ? 'both options' : 'the option'} and add at least two reasons first.</p>`; return;
+  }
+  const tied = state.two ? net(state.a) === net(state.b) : net(state.a) === 0;
+  if (tied && !breakTie) {
+    coinFlip();
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Weighing…';
+  try {
+    const r = await fetch('/api/decide', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ q: state.q, a: state.a, b: state.two ? state.b : null })
+    });
+    if (!r.ok) throw new Error((await r.text()) || r.status);
+    state.v = await r.json();
+    renderVerdict(); scheduleSave();
+  } catch (err) {
+    el.innerHTML = `<p class="err">Couldn’t reach the decider (${esc(err.message)}).</p>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Decide for me';
+  }
+}
+
+// ---- load ----
+async function loadFromHash() {
+  const h = location.hash.slice(1);
+  if (h) { try { state = normalize(await decode(h)); } catch { state = blank(); } }
+  render();
+}
+window.addEventListener('hashchange', loadFromHash);
+loadFromHash();
+</script>
+</body>
+</html>
