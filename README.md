@@ -2,6 +2,9 @@
 
 **Stop overthinking. Start weighing.**
 
+<img width="1974" height="1686" alt="Screenshot 2026-11-08 at 10 17 16" src="https://github.com/user-attachments/assets/b863a994-fff5-40f1-a702-a790a4f2a300" />
+
+
 You already know how to make a hard decision: draw a line down a page, write the pros on one side and the cons on the other, and stare at it.
 
 This is that page. It just does the math.
@@ -21,3 +24,4 @@ This is that page. It just does the math.
 Benjamin Franklin called this method *moral algebra*. He did it with a quill.
 
 **Try it → [moral-algebra.sreeprasad-sp.workers.dev](https://moral-algebra.sreeprasad-sp.workers.dev)**
+
